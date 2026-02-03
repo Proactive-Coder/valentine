@@ -1,6 +1,19 @@
 export default function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   if (req.method === 'POST') {
-    const { phone, instagram } = req.body;
+    let body;
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    } catch (e) {
+      console.error('JSON parse error:', e);
+      return res.status(400).json({ success: false, message: 'Invalid JSON' });
+    }
+
+    const { phone, instagram } = body;
     
     if (!phone || !instagram) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
@@ -13,6 +26,6 @@ export default function handler(req, res) {
     
     res.status(200).json({ success: true, message: 'Response recorded!' });
   } else {
-    res.status(405).json({ message: 'Method not allowed' });
+    res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }
